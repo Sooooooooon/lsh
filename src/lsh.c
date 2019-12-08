@@ -1,10 +1,10 @@
 /***************************************************************************//**
 
-  @file         main.c
+  @file         lsh.c
 
-  @author       Stephen Brennan
+  @author       Kim soon, Park yang soo, Lim seong mook
 
-  @date         Thursday,  8 January 2015
+  @date         Sunday,  8 December 2019
 
   @brief        LSH (Libstephen SHell)
 
@@ -13,16 +13,65 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <dirent.h>
+#include <sys/stat.h>
 #include <string.h>
+#include <time.h>
+#include <termios.h>
+
+
+#define FILE_PATH_MAX_LENGTH 	100
+#define FILE_MAX_COUNT  		200
+#define PATH_MAX_LENGTH			255
+#define FILE_MAX_LENGTH 		20
+#define EXT_MAX_LENGTH  		5
+#define	ONE_LINE_FILE_NUMBER	4
 
 /*
   Function Declarations for builtin shell commands:
  */
+
+ struct FileEntry
+{
+	int  nNumber;
+	char szName[FILE_MAX_LENGTH];
+	int  nFileType;
+};
+int getch()
+{
+	struct termios oldt, newt;
+	int ch;
+	tcgetattr(STDIN_FILENO, &oldt);
+	newt = oldt;
+	newt.c_lflag &= ~(ICANON | ECHO);
+	tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+	ch = getchar();
+	tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+
+	return ch;
+}
+void GetFileType(char* szFileName, int* nFileType)
+{
+	struct stat fileStatus;
+	lstat(szFileName, &fileStatus);
+
+	if (S_ISBLK(fileStatus.st_mode)) 		*nFileType = BLOCK_SPECIAL_FILE;
+	else if (S_ISCHR(fileStatus.st_mode))	*nFileType = CHAR_SPECIAL_FILE;
+	else if (S_ISDIR(fileStatus.st_mode))	*nFileType = DIRECTORY;
+	else if (S_ISFIFO(fileStatus.st_mode))	*nFileType = PIPE_FILE;
+	else if (S_ISLNK(fileStatus.st_mode))	*nFileType = LINK_FILE;
+	else if (S_ISREG(fileStatus.st_mode))	*nFileType = REG_FILE;
+	else if (S_ISSOCK(fileStatus.st_mode))	*nFileType = SOCKET_FILE;
+}
+
+
+
 int lsh_cd(char **args);
 int lsh_help(char **args);
 int lsh_exit(char **args);
+int lsh_team12(char **args);
 
 /*
   List of builtin commands, followed by their corresponding functions.
@@ -30,13 +79,14 @@ int lsh_exit(char **args);
 char *builtin_str[] = {
   "cd",
   "help",
-  "exit"
+  "exit",
 };
 
 int (*builtin_func[]) (char **) = {
   &lsh_cd,
   &lsh_help,
-  &lsh_exit
+  &lsh_exit,
+
 };
 
 int lsh_num_builtins() {
@@ -249,7 +299,75 @@ void lsh_loop(void)
     free(args);
   } while (status);
 }
+/**
+  @ ADD fuction team12
+*/
+int lsh_team12(char  **args)
+{
+	int					nIsCopy	= TRUE;
+	int					nCursorIndex = 0;
+	int 				nFileEntryCount = 0;
 
+	while(TRUE)
+	{
+		system("clear");
+
+		int i = 0;
+		char szCurrentPath[PATH_MAX_LENGTH];
+		char szRealName[FILE_MAX_LENGTH];
+
+		// Status Bar Display
+		getcwd(szCurrentPath, PATH_MAX_LENGTH);
+		printf("%c[%d;%d;%dm  Path : %s  |  File Count : %d  |  ", 27, BOLD, BLACK, BACKGROUND_WHITE, szCurrentPath, nFileEntryCount);
+		PrintSystemTime();
+
+		// File Display
+		for (i = 0; i < nFileEntryCount; i++)
+		{
+			if(i % ONE_LINE_FILE_NUMBER == 0)
+			{
+				printf("\n");
+			}
+
+			printf("%c[%d;%d;%dm%20s\t", 27, ATTRIBUTE_OFF, RED + arrFileEntry[i].nFileType, (nCursorIndex == i) ? BACKGROUND_RED : BACKGROUND_BLACK, arrFileEntry[i].szName);
+		}
+
+		printf("\n");
+
+		// Real File Name
+		strncpy(szRealName, arrFileEntry[nCursorIndex].szName, FILE_MAX_LENGTH);
+		for (i = 0; i < FILE_MAX_LENGTH; i++)
+		{
+			if (szRealName[i] == ' ')
+			{
+				szRealName[i] = 0;
+				break;
+			}
+		}
+
+		// Cursor Move
+		char cInput = getch();
+		if (cInput == 'd')
+		{
+			nCursorIndex++;
+		}
+		else if (cInput == 'a')
+		{
+			nCursorIndex--;
+		}
+		else if (cInput == 'w')
+		{
+			nCursorIndex -= ONE_LINE_FILE_NUMBER;
+		}
+		else if (cInput == 's')
+		{
+			nCursorIndex += ONE_LINE_FILE_NUMBER;
+		}
+
+	}
+
+	return 1;
+}
 /**
    @brief Main entry point.
    @param argc Argument count.
@@ -267,4 +385,3 @@ int main(int argc, char **argv)
 
   return EXIT_SUCCESS;
 }
-
