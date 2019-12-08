@@ -44,6 +44,17 @@
 #define CYAN					36
 #define	WHITE					37
 
+#define BACKGROUND_BLACK		40
+#define BACKGROUND_RED			41
+#define BACKGROUND_WHITE		47
+
+#define BLOCK_SPECIAL_FILE		0
+#define CHAR_SPECIAL_FILE		1
+#define DIRECTORY				2
+#define PIPE_FILE				3
+#define LINK_FILE				4
+#define REG_FILE				5
+#define SOCKET_FILE				6
 /*
   Function Declarations for builtin shell commands:
  */
@@ -121,6 +132,38 @@ void PrintSystemTime()
 	printf("%s", ctime(&t));
 }
 
+void ExecuteProgram(char* szFile)
+{
+	pid_t pid = -1;
+	pid_t exitStatus = -1;
+
+	char szTemp[FILE_MAX_LENGTH];
+	strncpy(szTemp, szFile, FILE_MAX_LENGTH);
+
+	// Name empty space delete
+	int i;
+	for (i = 0; i < FILE_MAX_LENGTH; i++)
+	{
+		if (szTemp[i] == ' ')
+		{
+			szTemp[i] = 0;
+			break;
+		}
+	}
+
+	// Clear
+	system("clear");
+
+	pid = fork();
+	if (pid == 0)				// Child Process
+	{
+		execl(szTemp, (char*)0);
+	}
+	else						// Parent Process
+	{
+		wait(&exitStatus);
+	}
+}
 
 int lsh_cd(char **args);
 int lsh_help(char **args);
@@ -141,6 +184,7 @@ int (*builtin_func[]) (char **) = {
   &lsh_cd,
   &lsh_help,
   &lsh_exit,
+  &lsh_team12
 };
 
 int lsh_num_builtins() {
@@ -365,6 +409,8 @@ int lsh_team12(char  **args)
 	char 				szOriginalFilePath[FILE_PATH_MAX_LENGTH];
 	char 				szDestinationFileName[FILE_MAX_LENGTH];
 
+	// Read Directory and Create File Entry
+	GetCurrentDirectoryFiles(&nFileEntryCount, arrFileEntry);
 
 	while(TRUE)
 	{
@@ -468,23 +514,60 @@ int lsh_team12(char  **args)
 			GetCurrentDirectoryFiles(&nFileEntryCount, arrFileEntry);
 			nCursorIndex = 0;
 		}
+		// File Copy
+		else if (cInput == 'c')
+		{
+			sprintf(szOriginalFilePath, "%s/%s", szCurrentPath, szRealName);
+			strcpy(szDestinationFileName, szRealName);
+			nIsCopy = TRUE;
+		}
+		// File Move
+		else if (cInput == 'x')
+		{
+			sprintf(szOriginalFilePath, "%s/%s", szCurrentPath, szRealName);
+			strcpy(szDestinationFileName, szRealName);
+			nIsCopy = FALSE;
+		}
+		// File Paste
+		else if (cInput == 'v')
+		{
+			if (nIsCopy)
+			{
+				char szTemp[PATH_MAX_LENGTH];
+				sprintf(szTemp, "cp %s %s", szOriginalFilePath, szDestinationFileName);
+				system(szTemp);
+			}
+			else
+			{
+				char szTemp[PATH_MAX_LENGTH];
+				sprintf(szTemp, "mv %s %s", szOriginalFilePath, szDestinationFileName);
+				system(szTemp);
+			}
 
+			// Reload
+			GetCurrentDirectoryFiles(&nFileEntryCount, arrFileEntry);
+			nCursorIndex = 0;
+		}
 
+		// Index boundary
+		if (nCursorIndex < 0)
+		{
+			nCursorIndex = 0;
+		}
+		if (nCursorIndex >= nFileEntryCount - 1)
+		{
+			nCursorIndex = nFileEntryCount - 2;
+		}
 	}
 
 	return 1;
 }
-
-
 /**
-
    @brief Main entry point.
    @param argc Argument count.
    @param argv Argument vector.
    @return status code
-
  */
-
 int main(int argc, char **argv)
 {
   // Load config files, if any.
