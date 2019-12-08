@@ -50,12 +50,13 @@ press key [--similar to existing linux command]  description command
 ![screenshot5](./image/5.folder_check.PNG)
 * check new directory  
 ![screenshot6](./image/6.cut_paste1.PNG)
-* Press key “I” to copy the file at the current cursor.
+* Press key “C” to copy the file at the current cursor.
 ![screenshot7](./image/7.cut_paste2.PNG)
-* Press key “I” to copy the file at the current cursor.
+* Press key “V” to paste the copyed file
 ![screenshot8](./image/8.cut_copy2.PNG)
-* Press key “V” to paste the file by copyed or moved
+* Press key “X” to cut the file at the current cursor.
 ![screenshot9](./image/9.copy_paste.PNG)
+* Press key “V” to paste the moved file
 ![screenshot10](./image/10.copy_paste2.PNG)
 ![screenshot11](./image/11.delete1.PNG)
 ![screenshot12](./image/12.delete2.PNG)
