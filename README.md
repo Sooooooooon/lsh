@@ -42,10 +42,14 @@ press key [--similar to existing linux command]  description command
 * run added function shell
 
 ![screenshot3](./image/3.outfile_excute.PNG)
-* run added function shell
+* move cursor by “W or A or S or D” key pressed and excute file “E” key pressed 
 
 ![screenshot4](./image/4.mkdir.PNG)
+* make directory by “N” key pressed
+
 ![screenshot5](./image/5.folder_check.PNG)
+* make directory by “N” key pressed
+
 ![screenshot6](./image/6.cut_paste1.PNG)
 ![screenshot7](./image/7.cut_paste2.PNG)
 ![screenshot8](./image/8.cut_copy2.PNG)
