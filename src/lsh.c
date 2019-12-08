@@ -29,6 +29,21 @@
 #define EXT_MAX_LENGTH  		5
 #define	ONE_LINE_FILE_NUMBER	4
 
+#define FALSE     				0
+#define TRUE     				1
+
+#define ATTRIBUTE_OFF			0
+#define BOLD					1
+
+#define BLACK					30
+#define RED						31
+#define	GREEN					32
+#define YELLOW					33
+#define BLUE					34
+#define MAGENTA					35
+#define CYAN					36
+#define	WHITE					37
+
 /*
   Function Declarations for builtin shell commands:
  */
@@ -65,7 +80,46 @@ void GetFileType(char* szFileName, int* nFileType)
 	else if (S_ISREG(fileStatus.st_mode))	*nFileType = REG_FILE;
 	else if (S_ISSOCK(fileStatus.st_mode))	*nFileType = SOCKET_FILE;
 }
+void GetCurrentDirectoryFiles(int* pFileEntryCount, struct FileEntry* arrFileEntry)
+{
+	// Init
+	*pFileEntryCount = 0;
 
+	// Read Directory
+	struct dirent* pDirent;
+	DIR* currentDirectory = opendir("./");
+
+	while((pDirent = readdir(currentDirectory)) != NULL)
+	{
+		// Input File Number
+		arrFileEntry[*pFileEntryCount].nNumber = *pFileEntryCount;
+
+		// Input File Name
+		strncpy(arrFileEntry[*pFileEntryCount].szName, pDirent->d_name, FILE_MAX_LENGTH);
+		int i;
+		for(i = strlen(pDirent->d_name); i < FILE_MAX_LENGTH; i++)
+		{
+			arrFileEntry[*pFileEntryCount].szName[i] = ' ';
+		}
+		arrFileEntry[*pFileEntryCount].szName[FILE_MAX_LENGTH-1] = 0;
+
+		// Input File Kind
+		GetFileType(pDirent->d_name, &arrFileEntry[*pFileEntryCount].nFileType);
+
+		// FIle Count Increase
+		(*pFileEntryCount)++;
+	}
+
+	closedir(currentDirectory);
+}
+
+void PrintSystemTime()
+{
+	time_t t;
+	time(&t);
+
+	printf("%s", ctime(&t));
+}
 
 
 int lsh_cd(char **args);
@@ -80,13 +134,13 @@ char *builtin_str[] = {
   "cd",
   "help",
   "exit",
+  "team12"
 };
 
 int (*builtin_func[]) (char **) = {
   &lsh_cd,
   &lsh_help,
   &lsh_exit,
-
 };
 
 int lsh_num_builtins() {
@@ -307,6 +361,10 @@ int lsh_team12(char  **args)
 	int					nIsCopy	= TRUE;
 	int					nCursorIndex = 0;
 	int 				nFileEntryCount = 0;
+	struct FileEntry 	arrFileEntry[FILE_MAX_COUNT];
+	char 				szOriginalFilePath[FILE_PATH_MAX_LENGTH];
+	char 				szDestinationFileName[FILE_MAX_LENGTH];
+
 
 	while(TRUE)
 	{
@@ -363,17 +421,70 @@ int lsh_team12(char  **args)
 		{
 			nCursorIndex += ONE_LINE_FILE_NUMBER;
 		}
+		// execute
+		else if (cInput == 'e')
+		{
+			if (arrFileEntry[nCursorIndex].nFileType == DIRECTORY)
+			{
+				// Current Directory Change
+				chdir(szRealName);
+
+				// Reload
+				GetCurrentDirectoryFiles(&nFileEntryCount, arrFileEntry);
+				nCursorIndex = 0;
+			}
+			else
+			{
+				ExecuteProgram(arrFileEntry[nCursorIndex].szName);
+			}
+		}
+		// quit
+		else if (cInput == 'q')
+		{
+			break;
+		}
+		// delete
+		else if (cInput == 'z')
+		{
+			if (arrFileEntry[nCursorIndex].nFileType == DIRECTORY)
+			{
+				rmdir(szRealName);
+			}
+			else
+			{
+				unlink(szRealName);
+			}
+
+			// Reload
+			GetCurrentDirectoryFiles(&nFileEntryCount, arrFileEntry);
+			nCursorIndex = 0;
+		}
+		// Create Directory
+		else if (cInput == 'n')
+		{
+			mkdir("new_directory", 0755);
+
+			// Reload
+			GetCurrentDirectoryFiles(&nFileEntryCount, arrFileEntry);
+			nCursorIndex = 0;
+		}
+
 
 	}
 
 	return 1;
 }
+
+
 /**
+
    @brief Main entry point.
    @param argc Argument count.
    @param argv Argument vector.
    @return status code
+
  */
+
 int main(int argc, char **argv)
 {
   // Load config files, if any.
