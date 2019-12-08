@@ -54,10 +54,15 @@ press key [--similar to existing linux command]  description command
 ![screenshot7](./image/7.cut_paste2.PNG)
 * Press key “V” to paste the copyed file
 ![screenshot8](./image/8.cut_copy2.PNG)
-* Press key “X” to cut the file at the current cursor.
+* check above result 
 ![screenshot9](./image/9.copy_paste.PNG)
-* Press key “V” to paste the moved file
+* Press key “X” to cut the file at the current cursor.
 ![screenshot10](./image/10.copy_paste2.PNG)
-![screenshot11](./image/11.delete1.PNG)
+* Press key “V” to paste the moved file
+
 ![screenshot12](./image/12.delete2.PNG)
+* Press key “D” to delete file or directory
+
 ![screenshot13](./image/13.q_exit.PNG)
+* Press key “Q” to quit this function shell
+
