@@ -1,39 +1,56 @@
-LSH
+project members
 ===
+Team No.12 B589006 김순, B589025 박양수, B589060 임성묵
 
-LSH is a simple implementation of a shell in C, and it is the subject of a
-tutorial on [my website][1].  It demonstrates the basics of how a shell works.
-That is: read, parse, fork, exec, and wait.  Since its purpose is demonstration
-(not feature completeness or even fitness for casual use), it has many
-limitations, including:
+Reason for selecting project
+===
+We study opensource class for 6months. While learning this class, most of Student think hard in command line linux because black background, and first experience is Command environment. And Control command handle stickle. And our team added shell function to make it more intuitive and user-friendly and convenient handle file. Enjoy our added functions.
 
-* Commands must be on a single line.
-* Arguments must be separated by whitespace.
-* No quoting arguments or escaping whitespace.
-* No piping or redirection.
-* Only builtins are: `cd`, `help`, `exit`.
+Additional Options
+===
+  * Improved readability and more conveniently
+  * Anyone easily handle file (move, copy, paste, delete, make directory)
 
-Contributing
-------------
+How to use functions?
+===
+```
 
-Since this is the subject of a tutorial, I'm not looking to extend it with
-additional features at this time.  So I won't be accepting any pull requests
-that aren't related to bug fixes (and I'm sure there are still bugs in the
-code!).
+Usage: press the key below description
 
-However, that doesn't mean that you shouldn't play with the code, make changes,
-and explore new features!  That's the whole point of this project!  It's just
-that other people are doing the same thing, and this project is merely a
-starting point for your own exploration.
+press key [--similar to existing linux command]  description command
 
-On that note, I would be just tickled if you dropped me a line (see my website
-for contact info) to show me the cool new features you've added!
+  W,                      cursor move up
+  A,                      cursor move left
+  S,                      cursor move down
+  D,                      cursor move right
+  E, --excute             excute output file or program file
+  Q, --quit               this shell function exit
+  Z, --delete             delete the file pointed to the current cursor
+  N, --mkdir              make new directory 
+  C, --copy               copy the file pointed to the current cursor
+  X, --move               move the file pointed to the current cursor
+  V, --paste              paste the file by copyed or moved
+```
 
-License
--------
-
-This code is in the public domain (see [UNLICENSE](UNLICENSE) for more details).
-This means you can use, modify, and distribute it without any restriction.  I
-appreciate, but don't require, acknowledgement in derivative works.
 
 [1]: http://brennan.io/2015/01/16/write-a-shell-in-c/
+
+![screenshot1](./image/1.lsh_execute.PNG)
+* excute LSH shell(our team fork LSH shell) 
+
+![screenshot2](./image/2.team12_execute.PNG)
+* run added function shell
+
+![screenshot3](./image/3.outfile_excute.PNG)
+* run added function shell
+
+![screenshot4](./image/4.mkdir.PNG)
+![screenshot5](./image/5.folder_check.PNG)
+![screenshot6](./image/6.cut_paste1.PNG)
+![screenshot7](./image/7.cut_paste2.PNG)
+![screenshot8](./image/8.cut_copy2.PNG)
+![screenshot9](./image/9.copy_paste.PNG)
+![screenshot10](./image/10.copy_paste2.PNG)
+![screenshot11](./image/11.delete1.PNG)
+![screenshot12](./image/12.delete2.PNG)
+![screenshot13](./image/13.q_exit.PNG)
